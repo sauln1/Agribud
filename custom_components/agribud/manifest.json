@@ -5,10 +5,10 @@
   "config_flow": true,
   "dependencies": [
     "http"
-  ],
+  ],  
   "documentation": "https://github.com/sauln1/Agribud",
-  "issue_tracker": "https://github.com/sauln1/Agribud/issues",
   "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/sauln1/Agribud/issues",
   "requirements": [
     "aiohttp>=3.9.0"
   ],
