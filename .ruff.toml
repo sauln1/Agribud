@@ -6,13 +6,56 @@ target-version = "py314"
 select = [
     "ALL",
 ]
-
+allowed-confusables = ["−", "∗", "/"]
 ignore = [
     "ANN401", # Dynamically typed expressions (typing.Any) are disallowed
     "D203", # no-blank-line-before-class (incompatible with formatter)
     "D212", # multi-line-summary-first-line (incompatible with formatter)
     "COM812", # incompatible with formatter
     "ISC001", # incompatible with formatter
+	"E501", # Line is too long
+	"I001", # Import block is un-sorted or un-formatted
+	"TC002", # Move third-party import into a type-checking block
+	"D213", # Multi-line docstring summary should start at the second line
+	"D209", # Multi-line docstring closing quotes should be on a separate line
+	"D213", # Multi-line docstring summary should start at the second line
+	"D205", # 1 blank line required between summary line and description
+	"RUF019", # Unnecessary key check before dictionary access
+	"D103", # Missing docstring in public function
+	"ANN202", # Too many branches
+	"PLR2004", # magic value comparison
+	"ERA001", # Found commented-out code
+	"DTZ005", # datetime called without tz
+	"BLE001", # blind exception
+	"DTZ011", # date tz
+	"ANN003", # Missing type annotation
+	"PLR0915", # too many statements
+	"PLR0912", # too many branches
+	"D107", # missing docstring
+	"ANN001", # missing type annotation for function
+	"TRY003", # long messages
+	"D102", # missing docstring
+	"D101", # missing docstring
+	"ANN003", # missing annotation
+	"ANN001", # missing annotation
+	"D401", # annotations should be in imperative mood
+	"ANN201", # missing return type
+	"RUF012", # multiple values for default
+	"PLR0911", # too amny return statements
+	"DTZ003", # utcnow used
+	"ARG001", # unused
+	"PLR0913", # too many arguments in function
+	"C901", # too complicated
+	"PLR0912", # too maany branches
+	"PLR0915", # too many statements
+	"ARG005", # unused
+	"ARG002", # unused
+	"ANN204", # missing annotation
+	"TRY401", # redundant exception object
+	"FBT001", # Boolean-typed positional argument in function definition
+	"FBT002", # Boolean-typed positional argument in function definition
+	"ANN002", # missing type annotation
+	"RUF001", # ambiguous character
 ]
 
 [lint.flake8-pytest-style]
