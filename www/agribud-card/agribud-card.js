@@ -1,8 +1,9 @@
 /**
- * Agribud Card  v1.1.1
+ * Agribud Card  v1.1.2
  * type: custom:agribud-card
  *
- * v1.1.0 — Theme toggle + section reorder + scroll containers
+ * v1.1.2 — Theme toggle + section reorder + scroll containers
+ *  - Fixed unability for user to drill down into plant details using the scrollable plant list.
  *  - New Settings → Card display → Theme toggle (Light / Dark). Light uses
  *    HA theme variables so custom themes are respected; Dark uses a
  *    coordinated dark palette with a warm peach accent. Persisted per
@@ -23,31 +24,6 @@
  *  - Dark mode pill colors brightened from v1.0.x for better legibility
  *    against dark surfaces.
  *
- * v1.0.0 — Initial public release.
- *  - Stable: Verdantly Gardening API (via RapidAPI), 25 calls/month free
- *    tier with aggressive caching (search cache 30d, full plant detail
- *    inline so add_plant is 0 extra calls, soft-deletion with 6-month
- *    species cache + slim archival after).
- *  - Trading card: modern white surface, plant image with status pill
- *    overlay, soft pastel light/water tiles, kv detail grid, scrollable
- *    care instructions, taxonomy footer. Auto / portrait / landscape
- *    layout toggle (Bootstrap-style segmented control).
- *  - Plant statuses: scheduled / healthy / thirsty / danger / harvested /
- *    dead (terminal events sticky until plant deleted). Status badge on
- *    plant icon in main list. 💧 (overdue), 🌧 (rain-watered), or none.
- *  - Calendar legend: Care + Events sections with column-stacked
- *    label-above-items so mobile doesn't collapse them onto one line.
- *  - Planner views: Week (existing) and Season (replaced Month — list
- *    of plants planted in each season+year with end-status pills).
- *  - Soft-deleted plants kept 6 months in cache (Recent Plants chip
- *    strip lets you re-add at zero API cost). After 6 months, plants
- *    are archived to a slim history-only record (name, dates, events)
- *    preserved indefinitely so the Season view never loses history.
- *  - Per-plant user overrides: every editable Verdantly field can be
- *    overridden via the Edit details overlay; empty values fall back
- *    to the Verdantly response.
- *  - Frost detection from weather entity attributes; rain detection
- *    auto-logs rain_detected events per plant.
  */
 
 const DOMAIN = "agribud";
@@ -1549,7 +1525,7 @@ class AgribudCard extends HTMLElement {
 
       <div id="view-container"></div>
 
-      <div style="margin-top:14px;font-size:10px;color:var(--secondary-text-color);opacity:.45;text-align:right;user-select:none">agribud-v1.1.1</div>
+      <div style="margin-top:14px;font-size:10px;color:var(--secondary-text-color);opacity:.45;text-align:right;user-select:none">agribud-v1.1.2</div>
 
       ${this._tplPlantOverlay()}
       ${this._tplSettingsOverlay()}
@@ -1747,6 +1723,11 @@ class AgribudCard extends HTMLElement {
     this.shadowRoot.querySelectorAll(".plan-lbl-clickable[data-planner-pid]").forEach(el => {
       el.onclick = () => this._openPlantDetail(el.dataset.plannerPid);
     });
+    // Main-view Plants list: clicking a row in the scrollable plant table
+    // opens that plant's detail popup. The plot-detail view binds this via
+    // _bindPlotView(); the main view also renders _tplPlantTable() and
+    // needs the same binding to make the rows clickable.
+    this._bindPlantRows();
   }
 
   _handleMetricClick(metric) {
@@ -3307,7 +3288,7 @@ class AgribudCard extends HTMLElement {
         <span style="color:var(--secondary-text-color)">API client:</span>
         <span style="color:${ok ? "#0F6E56" : "#993C1D"};font-weight:600">${ok ? "✓ Ready" : "✗ Not loaded"}</span>${usageRow}
         <span style="color:var(--secondary-text-color)">Backend http_api:</span>
-        <span style="font-family:monospace;font-size:11px">${data.http_api_version || "(missing — file is older than v1.1.1)"}</span>
+        <span style="font-family:monospace;font-size:11px">${data.http_api_version || "(missing — file is older than v1.1.2)"}</span>
       </div>`;
       // Pre-fill the form fields from backend values when card config doesn't override
       const wsel = this._el("cfg-weather");
@@ -4105,7 +4086,7 @@ if (!window.customCards.some(c => c.type === "agribud-card")) {
   });
 }
 console.info(
-  "%c AGRIBUD CARD %c v1.1.1 ",
+  "%c AGRIBUD CARD %c v1.1.2 ",
   "background:#1D9E75;color:#fff;font-weight:bold;padding:2px 4px;border-radius:4px 0 0 4px",
   "background:#0F6E56;color:#fff;padding:2px 4px;border-radius:0 4px 4px 0",
 );
