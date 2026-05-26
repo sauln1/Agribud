@@ -1,16 +1,16 @@
-"""Custom HTTP endpoints for Agribud card communication.
+"""Custom HTTP endpoints for Agribuddy card communication.
 
 Endpoints:
-  GET  /api/agribud/status                — integration health and masked config
-  GET  /api/agribud/test_connection       — verifies stored Verdantly key
-  GET  /api/agribud/search_plants?q=...   — Verdantly species-list search
-  GET  /api/agribud/species/<id>          — Verdantly species detail
-  POST /api/agribud/update_config         — update weather entity, reload integration
-  GET  /api/agribud/plots                 — list grow plots
-  POST /api/agribud/plot_create           — create a grow plot
-  GET  /api/agribud/plots/<plot_id>       — fetch one plot
-  PUT  /api/agribud/plots/<plot_id>       — update plot name/description
-  DELETE /api/agribud/plots/<plot_id>     — remove plot
+  GET  /api/agribuddy/status                — integration health and masked config
+  GET  /api/agribuddy/test_connection       — verifies stored Verdantly key
+  GET  /api/agribuddy/search_plants?q=...   — Verdantly species-list search
+  GET  /api/agribuddy/species/<id>          — Verdantly species detail
+  POST /api/agribuddy/update_config         — update weather entity, reload integration
+  GET  /api/agribuddy/plots                 — list grow plots
+  POST /api/agribuddy/plot_create           — create a grow plot
+  GET  /api/agribuddy/plots/<plot_id>       — fetch one plot
+  PUT  /api/agribuddy/plots/<plot_id>       — update plot name/description
+  DELETE /api/agribuddy/plots/<plot_id>     — remove plot
 """
 
 from __future__ import annotations
@@ -43,28 +43,28 @@ _HTTP_API_VERSION = "1.1.1"
 
 
 def async_register_views(hass: HomeAssistant) -> None:
-    """Register all Agribud HTTP views.
+    """Register all Agribuddy HTTP views.
 
     Each view is registered in its own try/except so a single failure doesn't
     prevent later views from registering. Logs at WARNING level so the output
     is visible regardless of how the user has configured logging.
     """
     _LOGGER.warning(
-        "Agribud: async_register_views called — http_api version %s",
+        "Agribuddy: async_register_views called — http_api version %s",
         _HTTP_API_VERSION,
     )
     views = [
-        ("AgribudStatusView", AgribudStatusView),
-        ("AgribudTestConnectionView", AgribudTestConnectionView),
-        ("AgribudSearchView", AgribudSearchView),
-        ("AgribudSpeciesView", AgribudSpeciesView),
-        ("AgribudUpdateConfigView", AgribudUpdateConfigView),
-        ("AgribudPlotsView", AgribudPlotsView),
-        ("AgribudPlotCreateView", AgribudPlotCreateView),
-        ("AgribudPlotView", AgribudPlotView),
-        ("AgribudWeatherLogView", AgribudWeatherLogView),
-        ("AgribudDeletedSpeciesView", AgribudDeletedSpeciesView),
-        ("AgribudSeasonView", AgribudSeasonView),
+        ("AgribuddyStatusView", AgribuddyStatusView),
+        ("AgribuddyTestConnectionView", AgribuddyTestConnectionView),
+        ("AgribuddySearchView", AgribuddySearchView),
+        ("AgribuddySpeciesView", AgribuddySpeciesView),
+        ("AgribuddyUpdateConfigView", AgribuddyUpdateConfigView),
+        ("AgribuddyPlotsView", AgribuddyPlotsView),
+        ("AgribuddyPlotCreateView", AgribuddyPlotCreateView),
+        ("AgribuddyPlotView", AgribuddyPlotView),
+        ("AgribuddyWeatherLogView", AgribuddyWeatherLogView),
+        ("AgribuddyDeletedSpeciesView", AgribuddyDeletedSpeciesView),
+        ("AgribuddySeasonView", AgribuddySeasonView),
     ]
     successes, failures = [], []
     for name, cls in views:
@@ -74,14 +74,14 @@ def async_register_views(hass: HomeAssistant) -> None:
         except Exception as err:
             failures.append(f"{name} → {cls.url}: {type(err).__name__}: {err}")
             _LOGGER.exception(
-                "Agribud: register_view(%s) failed for url=%s — %s: %s",
+                "Agribuddy: register_view(%s) failed for url=%s — %s: %s",
                 name,
                 cls.url,
                 type(err).__name__,
                 err,
             )
     _LOGGER.warning(
-        "Agribud: HTTP view registration done — %d succeeded, %d failed.\n"
+        "Agribuddy: HTTP view registration done — %d succeeded, %d failed.\n"
         "  Successes:\n    %s\n  Failures:\n    %s",
         len(successes),
         len(failures),
@@ -151,11 +151,11 @@ def _require_admin(request) -> bool:
 # ── Views ─────────────────────────────────────────────────────────────────────
 
 
-class AgribudStatusView(HomeAssistantView):
-    """GET /api/agribud/status — integration health snapshot."""
+class AgribuddyStatusView(HomeAssistantView):
+    """GET /api/agribuddy/status — integration health snapshot."""
 
-    url = "/api/agribud/status"
-    name = "api:agribud:status"
+    url = "/api/agribuddy/status"
+    name = "api:agribuddy:status"
     requires_auth = True
 
     def __init__(self, hass):
@@ -190,7 +190,7 @@ class AgribudStatusView(HomeAssistantView):
                     usage_payload = v["usage"].as_dict()
                     break
         except Exception as err:
-            _LOGGER.debug("Agribud: status — could not read usage tracker: %s", err)
+            _LOGGER.debug("Agribuddy: status — could not read usage tracker: %s", err)
         payload = {
             "configured": True,
             "api_provider": "verdantly",
@@ -220,11 +220,11 @@ class AgribudStatusView(HomeAssistantView):
         return _json(payload)
 
 
-class AgribudTestConnectionView(HomeAssistantView):
-    """GET /api/agribud/test_connection — live Verdantly key test (costs 1 API call against the 25/month quota)."""
+class AgribuddyTestConnectionView(HomeAssistantView):
+    """GET /api/agribuddy/test_connection — live Verdantly key test (costs 1 API call against the 25/month quota)."""
 
-    url = "/api/agribud/test_connection"
-    name = "api:agribud:test_connection"
+    url = "/api/agribuddy/test_connection"
+    name = "api:agribuddy:test_connection"
     requires_auth = True
 
     def __init__(self, hass):
@@ -238,21 +238,21 @@ class AgribudTestConnectionView(HomeAssistantView):
                     "ok": False,
                     "error": "not_configured",
                     "message": (
-                        "Agribud is not set up. Go to "
-                        "Settings → Integrations → Add Integration → Agribud."
+                        "Agribuddy is not set up. Go to "
+                        "Settings → Integrations → Add Integration → Agribuddy."
                     ),
                 },
                 404,
             )
         try:
             await api.validate()
-            _LOGGER.info("Agribud: connection test passed — Verdantly API key is valid")
+            _LOGGER.info("Agribuddy: connection test passed — Verdantly API key is valid")
             return _json(
                 {"ok": True, "message": "Verdantly API key is valid and working."}
             )
         except VerdantlyAuthError as err:
             _LOGGER.exception(
-                "Agribud: connection test — Verdantly rejected key: %s", err
+                "Agribuddy: connection test — Verdantly rejected key: %s", err
             )
             return _json(
                 {
@@ -263,7 +263,7 @@ class AgribudTestConnectionView(HomeAssistantView):
                 401,
             )
         except VerdantlyRateLimitError as err:
-            _LOGGER.warning("Agribud: connection test — rate limit hit: %s", err)
+            _LOGGER.warning("Agribuddy: connection test — rate limit hit: %s", err)
             return _json(
                 {
                     "ok": False,
@@ -274,7 +274,7 @@ class AgribudTestConnectionView(HomeAssistantView):
             )
         except VerdantlyConnectionError as err:
             _LOGGER.exception(
-                "Agribud: connection test — cannot reach Verdantly: %s", err
+                "Agribuddy: connection test — cannot reach Verdantly: %s", err
             )
             return _json(
                 {
@@ -285,10 +285,10 @@ class AgribudTestConnectionView(HomeAssistantView):
                 502,
             )
         except VerdantlyApiError as err:
-            _LOGGER.exception("Agribud: connection test — Verdantly API error: %s", err)
+            _LOGGER.exception("Agribuddy: connection test — Verdantly API error: %s", err)
             return _json({"ok": False, "error": "api_error", "message": str(err)}, 502)
         except Exception as err:
-            _LOGGER.exception("Agribud: connection test — unexpected error")
+            _LOGGER.exception("Agribuddy: connection test — unexpected error")
             return _json(
                 {
                     "ok": False,
@@ -299,9 +299,9 @@ class AgribudTestConnectionView(HomeAssistantView):
             )
 
 
-class AgribudSearchView(HomeAssistantView):
-    url = "/api/agribud/search_plants"
-    name = "api:agribud:search_plants"
+class AgribuddySearchView(HomeAssistantView):
+    url = "/api/agribuddy/search_plants"
+    name = "api:agribuddy:search_plants"
     requires_auth = True
 
     def __init__(self, hass):
@@ -315,7 +315,7 @@ class AgribudSearchView(HomeAssistantView):
         state_raw = request.rel_url.query.get("state", "").strip().upper()
         if state_raw:
             _LOGGER.debug(
-                "Agribud: search received state=%r — ignored (APIFarmer has no state filter)",
+                "Agribuddy: search received state=%r — ignored (APIFarmer has no state filter)",
                 state_raw,
             )
         state = None  # Always None for APIFarmer
@@ -329,7 +329,7 @@ class AgribudSearchView(HomeAssistantView):
             return _json(
                 {
                     "error": "api_unavailable",
-                    "message": "Agribud not ready — complete the integration setup wizard first.",
+                    "message": "Agribuddy not ready — complete the integration setup wizard first.",
                 },
                 503,
             )
@@ -342,7 +342,7 @@ class AgribudSearchView(HomeAssistantView):
                 ts, results, url_used = cached
                 if time.time() - ts < SEARCH_CACHE_TTL_SECONDS:
                     _LOGGER.debug(
-                        "Agribud: search '%s' served from cache (%d results)",
+                        "Agribuddy: search '%s' served from cache (%d results)",
                         q,
                         len(results),
                     )
@@ -363,7 +363,7 @@ class AgribudSearchView(HomeAssistantView):
                 if isinstance(r, dict)
             ]
             _LOGGER.warning(
-                "Agribud: /search_plants q=%r → %d raw, %d cleaned (URL: %s)",
+                "Agribuddy: /search_plants q=%r → %d raw, %d cleaned (URL: %s)",
                 q,
                 len(results_raw),
                 len(cleaned),
@@ -383,15 +383,15 @@ class AgribudSearchView(HomeAssistantView):
                 }
             )
         except VerdantlyAuthError as err:
-            _LOGGER.exception("Agribud: search auth error: %s", err)
+            _LOGGER.exception("Agribuddy: search auth error: %s", err)
             return _json({"error": "invalid_auth", "message": str(err)}, 401)
         except VerdantlyRateLimitError as err:
             return _json({"error": "rate_limited", "message": str(err)}, 429)
         except VerdantlyApiError as err:
-            _LOGGER.warning("Agribud: search for '%s' failed: %s", q, err)
+            _LOGGER.warning("Agribuddy: search for '%s' failed: %s", q, err)
             return _json({"error": "api_error", "message": str(err)}, 502)
         except Exception as err:
-            _LOGGER.exception("Agribud: unexpected search error for '%s'", q)
+            _LOGGER.exception("Agribuddy: unexpected search error for '%s'", q)
             return _json({"error": "unknown", "message": str(err)}, 500)
 
 
@@ -462,7 +462,7 @@ _normalize_apifarmer_species = _normalize_verdantly_variety
 _normalize_flora_species = _normalize_verdantly_variety
 
 
-class AgribudSpeciesView(HomeAssistantView):
+class AgribuddySpeciesView(HomeAssistantView):
     """Returns full species detail for a known identifier — CACHE ONLY.
 
     Verdantly returns full plant detail inline in the search response, so
@@ -478,8 +478,8 @@ class AgribudSpeciesView(HomeAssistantView):
          to re-fetch its species_data.
     """
 
-    url = "/api/agribud/species/{species_id}"
-    name = "api:agribud:species"
+    url = "/api/agribuddy/species/{species_id}"
+    name = "api:agribuddy:species"
     requires_auth = True
 
     def __init__(self, hass):
@@ -491,7 +491,7 @@ class AgribudSpeciesView(HomeAssistantView):
 
         # 1. In-memory cache — populated by previous searches.
         if caches is not None and caches["species_cache"].get(sid):
-            _LOGGER.debug("Agribud: species id=%s served from in-memory cache", sid)
+            _LOGGER.debug("Agribuddy: species id=%s served from in-memory cache", sid)
             return _json(caches["species_cache"][sid])
 
         # 2. On-disk plant cache — match by id, variety_id, or scientific name.
@@ -507,7 +507,7 @@ class AgribudSpeciesView(HomeAssistantView):
                     if caches is not None:
                         caches["species_cache"][sid] = psd
                     _LOGGER.debug(
-                        "Agribud: species id=%s served from plant on-disk cache",
+                        "Agribuddy: species id=%s served from plant on-disk cache",
                         sid,
                     )
                     return _json(psd)
@@ -530,9 +530,9 @@ class AgribudSpeciesView(HomeAssistantView):
         )
 
 
-class AgribudUpdateConfigView(HomeAssistantView):
-    url = "/api/agribud/update_config"
-    name = "api:agribud:update_config"
+class AgribuddyUpdateConfigView(HomeAssistantView):
+    url = "/api/agribuddy/update_config"
+    name = "api:agribuddy:update_config"
     requires_auth = True
 
     def __init__(self, hass):
@@ -549,7 +549,7 @@ class AgribudUpdateConfigView(HomeAssistantView):
             return _json(
                 {
                     "error": "not_configured",
-                    "message": "No Agribud config entry found.",
+                    "message": "No Agribuddy config entry found.",
                 },
                 404,
             )
@@ -572,7 +572,7 @@ class AgribudUpdateConfigView(HomeAssistantView):
             if effective_old != new_value:
                 changed = True
                 _LOGGER.info(
-                    "Agribud: weather entity changed '%s' → '%s'",
+                    "Agribuddy: weather entity changed '%s' → '%s'",
                     effective_old,
                     new_value,
                 )
@@ -593,9 +593,9 @@ class AgribudUpdateConfigView(HomeAssistantView):
         )
 
 
-class AgribudPlotsView(HomeAssistantView):
-    url = "/api/agribud/plots"
-    name = "api:agribud:plots"
+class AgribuddyPlotsView(HomeAssistantView):
+    url = "/api/agribuddy/plots"
+    name = "api:agribuddy:plots"
     requires_auth = True
 
     def __init__(self, hass):
@@ -604,25 +604,25 @@ class AgribudPlotsView(HomeAssistantView):
     async def get(self, request):
         store = _get_store(self._hass)
         if store is None:
-            return _json({"error": "not_ready", "message": "Agribud not loaded."}, 503)
+            return _json({"error": "not_ready", "message": "Agribuddy not loaded."}, 503)
         try:
             return _json(store.get_all_plots())
         except Exception as err:
-            _LOGGER.exception("Agribud: GET /plots failed unexpectedly")
+            _LOGGER.exception("Agribuddy: GET /plots failed unexpectedly")
             return _json(
                 {"error": "internal", "message": f"{type(err).__name__}: {err}"}, 500
             )
 
 
-class AgribudPlotCreateView(HomeAssistantView):
-    """POST /api/agribud/plot_create — create a grow plot.
+class AgribuddyPlotCreateView(HomeAssistantView):
+    """POST /api/agribuddy/plot_create — create a grow plot.
 
-    Lives on its own URL (not /api/agribud/plots) to avoid aiohttp routing
+    Lives on its own URL (not /api/agribuddy/plots) to avoid aiohttp routing
     edge cases when a static URL shares a prefix with a dynamic one.
     """
 
-    url = "/api/agribud/plot_create"
-    name = "api:agribud:plot_create"
+    url = "/api/agribuddy/plot_create"
+    name = "api:agribuddy:plot_create"
     requires_auth = True
 
     def __init__(self, hass):
@@ -630,7 +630,7 @@ class AgribudPlotCreateView(HomeAssistantView):
 
     async def post(self, request):
         _LOGGER.info(
-            "Agribud: POST /plot_create entered — content-type=%r remote=%s",
+            "Agribuddy: POST /plot_create entered — content-type=%r remote=%s",
             request.headers.get("Content-Type"),
             request.remote,
         )
@@ -661,7 +661,7 @@ class AgribudPlotCreateView(HomeAssistantView):
             )
         store = _get_store(self._hass)
         if store is None:
-            return _json({"error": "not_ready", "message": "Agribud not loaded."}, 503)
+            return _json({"error": "not_ready", "message": "Agribuddy not loaded."}, 503)
         try:
             plot = await store.async_add_plot(
                 name=name,
@@ -672,15 +672,15 @@ class AgribudPlotCreateView(HomeAssistantView):
                 await coord.async_request_refresh()
             return _json({"ok": True, "plot": plot})
         except Exception as err:
-            _LOGGER.exception("Agribud: POST /plot_create failed")
+            _LOGGER.exception("Agribuddy: POST /plot_create failed")
             return _json(
                 {"error": "internal", "message": f"{type(err).__name__}: {err}"}, 500
             )
 
 
-class AgribudPlotView(HomeAssistantView):
-    url = "/api/agribud/plots/{plot_id}"
-    name = "api:agribud:plot"
+class AgribuddyPlotView(HomeAssistantView):
+    url = "/api/agribuddy/plots/{plot_id}"
+    name = "api:agribuddy:plot"
     requires_auth = True
 
     def __init__(self, hass):
@@ -689,7 +689,7 @@ class AgribudPlotView(HomeAssistantView):
     async def get(self, request, plot_id: str):
         store = _get_store(self._hass)
         if store is None:
-            return _json({"error": "not_ready", "message": "Agribud not loaded."}, 503)
+            return _json({"error": "not_ready", "message": "Agribuddy not loaded."}, 503)
         plot = store.get_plot(plot_id)
         if plot is None:
             return _json({"error": "not_found", "message": "Grow plot not found."}, 404)
@@ -702,7 +702,7 @@ class AgribudPlotView(HomeAssistantView):
             return _json({"error": "bad_request", "message": "Invalid JSON."}, 400)
         store = _get_store(self._hass)
         if store is None:
-            return _json({"error": "not_ready", "message": "Agribud not loaded."}, 503)
+            return _json({"error": "not_ready", "message": "Agribuddy not loaded."}, 503)
         plot = await store.async_update_plot(
             plot_id, **{k: v for k, v in body.items() if k in {"name", "description"}}
         )
@@ -716,7 +716,7 @@ class AgribudPlotView(HomeAssistantView):
     async def delete(self, request, plot_id: str):
         store = _get_store(self._hass)
         if store is None:
-            return _json({"error": "not_ready", "message": "Agribud not loaded."}, 503)
+            return _json({"error": "not_ready", "message": "Agribuddy not loaded."}, 503)
         ok = await store.async_remove_plot(plot_id)
         if not ok:
             return _json({"error": "not_found"}, 404)
@@ -726,16 +726,16 @@ class AgribudPlotView(HomeAssistantView):
         return _json({"ok": True})
 
 
-class AgribudWeatherLogView(HomeAssistantView):
-    """GET /api/agribud/weather_log — per-date rain/snow/frost observations.
+class AgribuddyWeatherLogView(HomeAssistantView):
+    """GET /api/agribuddy/weather_log — per-date rain/snow/frost observations.
 
     Returns: {"YYYY-MM-DD": {"rain": bool, "snow": bool, "frost": bool,
                               "conditions": [str, ...]}, ...}
     Used by the card to draw weather icons in calendar day cells.
     """
 
-    url = "/api/agribud/weather_log"
-    name = "api:agribud:weather_log"
+    url = "/api/agribuddy/weather_log"
+    name = "api:agribuddy:weather_log"
     requires_auth = True
 
     def __init__(self, hass):
@@ -744,20 +744,20 @@ class AgribudWeatherLogView(HomeAssistantView):
     async def get(self, request):
         store = _get_store(self._hass)
         if store is None:
-            return _json({"error": "not_ready", "message": "Agribud not loaded."}, 503)
+            return _json({"error": "not_ready", "message": "Agribuddy not loaded."}, 503)
         try:
             log = store.get_weather_log()
-            _LOGGER.debug("Agribud: GET /weather_log returning %d entries", len(log))
+            _LOGGER.debug("Agribuddy: GET /weather_log returning %d entries", len(log))
             return _json(log)
         except Exception as err:
-            _LOGGER.exception("Agribud: GET /weather_log failed unexpectedly")
+            _LOGGER.exception("Agribuddy: GET /weather_log failed unexpectedly")
             return _json(
                 {"error": "internal", "message": f"{type(err).__name__}: {err}"}, 500
             )
 
 
-class AgribudDeletedSpeciesView(HomeAssistantView):
-    """GET /api/agribud/deleted_species — list cached species_data from
+class AgribuddyDeletedSpeciesView(HomeAssistantView):
+    """GET /api/agribuddy/deleted_species — list cached species_data from
     soft-deleted plants.
 
     Used by the card's "Recent Plants" strip to surface previously-grown
@@ -769,8 +769,8 @@ class AgribudDeletedSpeciesView(HomeAssistantView):
     deleted first.
     """
 
-    url = "/api/agribud/deleted_species"
-    name = "api:agribud:deleted_species"
+    url = "/api/agribuddy/deleted_species"
+    name = "api:agribuddy:deleted_species"
     requires_auth = True
 
     def __init__(self, hass):
@@ -779,23 +779,23 @@ class AgribudDeletedSpeciesView(HomeAssistantView):
     async def get(self, request):
         store = _get_store(self._hass)
         if store is None:
-            return _json({"error": "not_ready", "message": "Agribud not loaded."}, 503)
+            return _json({"error": "not_ready", "message": "Agribuddy not loaded."}, 503)
         try:
             results = store.get_deleted_species_cache()
             _LOGGER.debug(
-                "Agribud: GET /deleted_species returning %d cached species",
+                "Agribuddy: GET /deleted_species returning %d cached species",
                 len(results),
             )
             return _json({"results": results, "count": len(results)})
         except Exception as err:
-            _LOGGER.exception("Agribud: GET /deleted_species failed unexpectedly")
+            _LOGGER.exception("Agribuddy: GET /deleted_species failed unexpectedly")
             return _json(
                 {"error": "internal", "message": f"{type(err).__name__}: {err}"}, 500
             )
 
 
-class AgribudSeasonView(HomeAssistantView):
-    """GET /api/agribud/season — list every plant the user has ever started,
+class AgribuddySeasonView(HomeAssistantView):
+    """GET /api/agribuddy/season — list every plant the user has ever started,
     grouped by season+year of start_date.
 
     Returns a flat array of slim plant records (the card groups them
@@ -808,8 +808,8 @@ class AgribudSeasonView(HomeAssistantView):
     record was archived to a slim history-only form.
     """
 
-    url = "/api/agribud/season"
-    name = "api:agribud:season"
+    url = "/api/agribuddy/season"
+    name = "api:agribuddy:season"
     requires_auth = True
 
     def __init__(self, hass):
@@ -818,13 +818,13 @@ class AgribudSeasonView(HomeAssistantView):
     async def get(self, request):
         store = _get_store(self._hass)
         if store is None:
-            return _json({"error": "not_ready", "message": "Agribud not loaded."}, 503)
+            return _json({"error": "not_ready", "message": "Agribuddy not loaded."}, 503)
         try:
             results = store.get_season_view()
-            _LOGGER.debug("Agribud: GET /season returning %d items", len(results))
+            _LOGGER.debug("Agribuddy: GET /season returning %d items", len(results))
             return _json({"results": results, "count": len(results)})
         except Exception as err:
-            _LOGGER.exception("Agribud: GET /season failed unexpectedly")
+            _LOGGER.exception("Agribuddy: GET /season failed unexpectedly")
             return _json(
                 {"error": "internal", "message": f"{type(err).__name__}: {err}"}, 500
             )

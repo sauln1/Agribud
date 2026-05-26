@@ -1,4 +1,4 @@
-"""Config flow for Agribud — Verdantly Gardening API key (via RapidAPI)
+"""Config flow for Agribuddy — Verdantly Gardening API key (via RapidAPI)
 + HA weather entity."""
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ _LOGGER = logging.getLogger(__name__)
 _ENTITY_SELECTOR = EntitySelector(EntitySelectorConfig())
 
 
-class AgribudConfigFlow(ConfigFlow, domain=DOMAIN):
+class AgribuddyConfigFlow(ConfigFlow, domain=DOMAIN):
     # VERSION 4: Verdantly Gardening API migration (via RapidAPI).
     # Existing entries from APIFarmer (v3), Flora (v2), or Perenual (v1)
     # all need to be re-added since the key shape and host differ.
@@ -91,10 +91,10 @@ class AgribudConfigFlow(ConfigFlow, domain=DOMAIN):
     @staticmethod
     @callback
     def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
-        return AgribudOptionsFlow(config_entry)
+        return AgribuddyOptionsFlow(config_entry)
 
 
-class AgribudOptionsFlow(OptionsFlow):
+class AgribuddyOptionsFlow(OptionsFlow):
     def __init__(self, entry: ConfigEntry) -> None:
         self._entry = entry
 

@@ -25,7 +25,7 @@ from homeassistant.helpers.storage import Store
 
 _LOGGER = logging.getLogger(__name__)
 
-_STORE_KEY = "agribud.api_usage"
+_STORE_KEY = "agribuddy.api_usage"
 _STORE_VERSION = 1
 
 # Verdantly free-tier quota (calls per calendar month). Surfaced in the
@@ -59,7 +59,7 @@ class ApiUsageTracker:
             }
         self._maybe_reset_month()
         _LOGGER.debug(
-            "Agribud usage tracker loaded: month=%s, count=%d/%d",
+            "Agribuddy usage tracker loaded: month=%s, count=%d/%d",
             self._state["month_key"],
             self._state["count"],
             VERDANTLY_FREE_MONTHLY_QUOTA,
@@ -69,7 +69,7 @@ class ApiUsageTracker:
         cur = _current_month_key()
         if self._state.get("month_key") != cur:
             _LOGGER.info(
-                "Agribud usage tracker: new month %s (was %s) — resetting count.",
+                "Agribuddy usage tracker: new month %s (was %s) — resetting count.",
                 cur,
                 self._state.get("month_key"),
             )
@@ -88,7 +88,7 @@ class ApiUsageTracker:
             self._hass.async_create_task(self._async_save())
         except Exception as err:
             # Don't let tracking failures break the API call path.
-            _LOGGER.debug("Agribud usage tracker save scheduling failed: %s", err)
+            _LOGGER.debug("Agribuddy usage tracker save scheduling failed: %s", err)
 
     async def _async_save(self) -> None:
         if not self._dirty:
@@ -97,7 +97,7 @@ class ApiUsageTracker:
             await self._store.async_save(self._state)
             self._dirty = False
         except Exception as err:
-            _LOGGER.warning("Agribud usage tracker save failed: %s", err)
+            _LOGGER.warning("Agribuddy usage tracker save failed: %s", err)
 
     def current_count(self) -> int:
         """Return the number of API calls recorded this month."""

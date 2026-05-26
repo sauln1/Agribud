@@ -1,4 +1,4 @@
-"""Persistent plant + event storage for Agribud (Verdantly edition).
+"""Persistent plant + event storage for Agribuddy (Verdantly edition).
 
 Plant record shape::
 
@@ -105,7 +105,7 @@ class PlantStore:
         # cache from growing unbounded while preserving season-view data.
         archived = self._archive_old_deleted_plants()
         _LOGGER.debug(
-            "Agribud: loaded %d plants (%d soft-deleted, kept for Recent), "
+            "Agribuddy: loaded %d plants (%d soft-deleted, kept for Recent), "
             "%d plots, %d archived (history only), %d weather-log entries, "
             "archived %d this load",
             len(self._data["plants"]),
@@ -138,7 +138,7 @@ class PlantStore:
             self._data["archived_plants"][pid] = slim
             del self._data["plants"][pid]
             _LOGGER.info(
-                "Agribud: archived expired plant id=%s name=%r (status=%s, end=%s)",
+                "Agribuddy: archived expired plant id=%s name=%r (status=%s, end=%s)",
                 pid,
                 slim.get("name"),
                 slim.get("end_status"),
@@ -342,7 +342,7 @@ class PlantStore:
         }
         self._data["plots"][plot_id] = plot
         await self._save()
-        _LOGGER.info("Agribud: added grow plot id=%s name='%s'", plot_id, name)
+        _LOGGER.info("Agribuddy: added grow plot id=%s name='%s'", plot_id, name)
         return plot
 
     async def async_remove_plot(self, plot_id: str) -> bool:
@@ -353,7 +353,7 @@ class PlantStore:
                 p["plot_id"] = None
         del self._data["plots"][plot_id]
         await self._save()
-        _LOGGER.info("Agribud: removed grow plot id=%s", plot_id)
+        _LOGGER.info("Agribuddy: removed grow plot id=%s", plot_id)
         return True
 
     async def async_update_plot(self, plot_id: str, **kwargs) -> dict | None:
@@ -406,7 +406,7 @@ class PlantStore:
         self._data["plants"][pid] = plant
         await self._save()
         _LOGGER.info(
-            "Agribud: added plant id=%s name='%s' species_id=%s plot=%s start=%s "
+            "Agribuddy: added plant id=%s name='%s' species_id=%s plot=%s start=%s "
             "(species_data cached: %s)",
             pid,
             name,
@@ -454,7 +454,7 @@ class PlantStore:
                     e["date"] = new_date
                     await self._save()
                     _LOGGER.info(
-                        "Agribud: re-anchored planted event for %s to %s",
+                        "Agribuddy: re-anchored planted event for %s to %s",
                         plant_id,
                         new_date,
                     )
@@ -522,7 +522,7 @@ class PlantStore:
         plant["user_overrides"] = current
         await self._save()
         _LOGGER.info(
-            "Agribud: plant %s overrides updated (%d active keys)",
+            "Agribuddy: plant %s overrides updated (%d active keys)",
             plant_id,
             len(current),
         )
@@ -552,7 +552,7 @@ class PlantStore:
         plant["deleted_at"] = datetime.now().isoformat(timespec="seconds")
         await self._save()
         _LOGGER.info(
-            "Agribud: soft-deleted plant id=%s name=%r (%d event(s), "
+            "Agribuddy: soft-deleted plant id=%s name=%r (%d event(s), "
             "species_data %s). Kept in cache for 6 months.",
             plant_id,
             plant_name,
@@ -573,7 +573,7 @@ class PlantStore:
     ) -> dict | None:
         plant = self._data["plants"].get(plant_id)
         if not plant:
-            _LOGGER.warning("Agribud: log_event — plant id=%s not found", plant_id)
+            _LOGGER.warning("Agribuddy: log_event — plant id=%s not found", plant_id)
             return None
         event = {
             "id": str(uuid.uuid4()),
@@ -590,7 +590,7 @@ class PlantStore:
     async def async_remove_event(self, plant_id: str, event_id: str) -> bool:
         plant = self._data["plants"].get(plant_id)
         if not plant:
-            _LOGGER.warning("Agribud: remove_event — plant id=%s not found", plant_id)
+            _LOGGER.warning("Agribuddy: remove_event — plant id=%s not found", plant_id)
             return False
         before = len(plant["events"])
         plant["events"] = [e for e in plant["events"] if e.get("id") != event_id]
@@ -654,7 +654,7 @@ class PlantStore:
                 del log[k]
         await self._save()
         _LOGGER.info(
-            "Agribud: weather log for %s — rain=%s snow=%s frost=%s "
+            "Agribuddy: weather log for %s — rain=%s snow=%s frost=%s "
             "condition=%r (changed)",
             date_str,
             new_rain,

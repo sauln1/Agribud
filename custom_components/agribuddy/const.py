@@ -1,7 +1,7 @@
-"""Constants for the Agribud integration (Verdantly Gardening API edition,
+"""Constants for the Agribuddy integration (Verdantly Gardening API edition,
 served via RapidAPI)."""
 
-DOMAIN = "agribud"
+DOMAIN = "agribuddy"
 
 # ── Config keys ────────────────────────────────────────────────────────────
 CONF_API_KEY = "api_key"
@@ -13,7 +13,7 @@ CONF_UPDATE_INTERVAL = "update_interval"
 # species data is fetched once when a plant is added (via the search API)
 # and cached on the plant record. Never re-fetched on a schedule.
 DEFAULT_UPDATE_INTERVAL = 1440  # minutes (24h)
-DEFAULT_NAME = "Agribud"
+DEFAULT_NAME = "Agribuddy"
 
 # ── Verdantly Gardening API (hosted via RapidAPI) ──────────────────────────
 # Auth requires TWO headers per RapidAPI's standard:

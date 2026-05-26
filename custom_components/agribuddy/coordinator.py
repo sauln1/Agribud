@@ -1,4 +1,4 @@
-"""DataUpdateCoordinator for Agribud.
+"""DataUpdateCoordinator for Agribuddy.
 
 Reads weather data from a HA weather entity. Does NOT auto-refresh species
 data from Verdantly — that's fetched once when a plant is added and cached on
@@ -12,7 +12,7 @@ weather entity changes state or attributes. That listener:
   - Persists today's observation to store.weather_log (for the calendar)
   - Logs `rain_detected` events on every active plant when rain is first seen
     that day (so days_since_watered resets and "needs water" indicators clear)
-  - Fires the `agribud_data_changed` bus event so the card refreshes immediately
+  - Fires the `agribuddy_data_changed` bus event so the card refreshes immediately
 """
 
 from __future__ import annotations
@@ -39,7 +39,7 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__name__)
 
 
-class AgribudCoordinator(DataUpdateCoordinator):
+class AgribuddyCoordinator(DataUpdateCoordinator):
     """Reads the configured weather entity and emits frost/rain auto-events."""
 
     def __init__(
@@ -73,7 +73,7 @@ class AgribudCoordinator(DataUpdateCoordinator):
                 self._on_weather_state_change,
             )
             _LOGGER.info(
-                "Agribud: subscribed to state changes for weather entity %s",
+                "Agribuddy: subscribed to state changes for weather entity %s",
                 weather_entity,
             )
 
@@ -98,7 +98,7 @@ class AgribudCoordinator(DataUpdateCoordinator):
         condition = (weather.get("condition") or "").strip()
 
         _LOGGER.debug(
-            "Agribud: weather state change — condition=%r precipitation=%r "
+            "Agribuddy: weather state change — condition=%r precipitation=%r "
             "tonight_low=%r → rain=%s snow=%s frost=%s",
             condition,
             weather.get("precipitation"),
@@ -134,7 +134,7 @@ class AgribudCoordinator(DataUpdateCoordinator):
         # indicators clear.
         if rain and self._rain_logged_date != today:
             _LOGGER.info(
-                "Agribud: rain detected (condition=%r, precip=%r) — auto-logging "
+                "Agribuddy: rain detected (condition=%r, precip=%r) — auto-logging "
                 "rain event for all plants. days_since_watered will reset.",
                 condition,
                 weather.get("precipitation"),
@@ -176,7 +176,7 @@ class AgribudCoordinator(DataUpdateCoordinator):
             try:
                 self._unsub_state_change()
             except Exception as err:
-                _LOGGER.warning("Agribud: failed to detach state listener: %s", err)
+                _LOGGER.warning("Agribuddy: failed to detach state listener: %s", err)
             self._unsub_state_change = None
         await super().async_shutdown()
 
@@ -188,7 +188,7 @@ class AgribudCoordinator(DataUpdateCoordinator):
         state = self.hass.states.get(self.weather_entity)
         if state is None:
             _LOGGER.warning(
-                "Agribud: weather entity '%s' not found in HA. "
+                "Agribuddy: weather entity '%s' not found in HA. "
                 "Update via card Settings or remove and re-add the integration.",
                 self.weather_entity,
             )
@@ -289,7 +289,7 @@ class AgribudCoordinator(DataUpdateCoordinator):
             condition=(weather.get("condition") or "").strip(),
         )
         _LOGGER.info(
-            "Agribud: auto-logging rain event for active plants (periodic refresh)"
+            "Agribuddy: auto-logging rain event for active plants (periodic refresh)"
         )
         await self.store.async_log_rain_all(0.0)
         self._rain_logged_date = today
@@ -314,14 +314,14 @@ class AgribudCoordinator(DataUpdateCoordinator):
                 "persistent_notification",
                 "create",
                 {
-                    "title": "Agribud — Frost Alert ❄️",
+                    "title": "Agribuddy — Frost Alert ❄️",
                     "message": f"Frost risk tonight! Low: {low}°C. Check your plants.",
                     "notification_id": f"{DOMAIN}_frost_{today}",
                 },
             )
         )
         self._frost_alerted_date = today
-        _LOGGER.warning("Agribud: frost alert fired (low: %s°C)", low)
+        _LOGGER.warning("Agribuddy: frost alert fired (low: %s°C)", low)
 
     # ── Accessors ─────────────────────────────────────────────────────────────
 

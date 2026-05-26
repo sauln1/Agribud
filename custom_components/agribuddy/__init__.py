@@ -1,4 +1,4 @@
-"""Agribud integration setup."""
+"""Agribuddy integration setup."""
 
 from __future__ import annotations
 
@@ -47,7 +47,7 @@ from .const import (
     START_TYPES,
     EVENT_PLANTED,
 )
-from .coordinator import AgribudCoordinator
+from .coordinator import AgribuddyCoordinator
 from .http_api import async_register_views
 from .store import PlantStore
 
@@ -141,7 +141,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         on_request=lambda endpoint: tracker.record(),
     )
     _LOGGER.info(
-        "Agribud: API client initialized (validation skipped to preserve "
+        "Agribuddy: API client initialized (validation skipped to preserve "
         "the 25-call/month Verdantly quota). Monthly calls used so far: %d",
         tracker.current_count(),
     )
@@ -152,14 +152,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     update_min = entry.options.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)
     # Weather entity may be edited via the options flow (entry.options) OR
     # the integration's setup wizard (entry.data). options-first so changes
-    # made in Settings → Devices & Services → Agribud → Configure take
+    # made in Settings → Devices & Services → Agribuddy → Configure take
     # effect on the next reload; falls back to data for the initial setup
     # value or when options haven't been touched.
     weather_entity = entry.options.get(
         CONF_WEATHER_ENTITY,
         entry.data.get(CONF_WEATHER_ENTITY, ""),
     )
-    coord = AgribudCoordinator(
+    coord = AgribuddyCoordinator(
         hass,
         api,
         store,
@@ -183,7 +183,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     _register_services(hass)
     entry.async_on_unload(entry.add_update_listener(_options_updated))
-    _LOGGER.info("Agribud: setup complete (entry_id=%s)", entry.entry_id)
+    _LOGGER.info("Agribuddy: setup complete (entry_id=%s)", entry.entry_id)
     return True
 
 
@@ -238,7 +238,7 @@ def _fire_data_changed(hass: HomeAssistant, kind: str, **extra) -> None:
     """Fire a bus event so the Lovelace card can react immediately."""
     payload = {"kind": kind, **extra}
     hass.bus.async_fire(f"{DOMAIN}_data_changed", payload)
-    _LOGGER.debug("Agribud: fired %s_data_changed kind=%s", DOMAIN, kind)
+    _LOGGER.debug("Agribuddy: fired %s_data_changed kind=%s", DOMAIN, kind)
 
 
 def _service_unavailable_notification(hass: HomeAssistant) -> None:
@@ -247,10 +247,10 @@ def _service_unavailable_notification(hass: HomeAssistant) -> None:
             "persistent_notification",
             "create",
             {
-                "title": "Agribud — service unavailable",
+                "title": "Agribuddy — service unavailable",
                 "message": (
-                    "Agribud is not loaded. Go to Settings → Devices & Services "
-                    "→ Agribud and check that the integration is healthy."
+                    "Agribuddy is not loaded. Go to Settings → Devices & Services "
+                    "→ Agribuddy and check that the integration is healthy."
                 ),
                 "notification_id": f"{DOMAIN}_service_unavailable",
             },
@@ -267,7 +267,7 @@ def _register_services(hass: HomeAssistant) -> None:
         store = _get_store(hass)
         api = _get_api(hass)
         if not store or not api:
-            _LOGGER.error("Agribud: add_plant called but store/api not loaded")
+            _LOGGER.error("Agribuddy: add_plant called but store/api not loaded")
             _service_unavailable_notification(hass)
             return
         d = call.data.get(ATTR_START_DATE)
@@ -284,7 +284,7 @@ def _register_services(hass: HomeAssistant) -> None:
             if cache:
                 cache["species_cache"][sid_str] = species_data
             _LOGGER.info(
-                "Agribud: add_plant using species_data supplied by caller "
+                "Agribuddy: add_plant using species_data supplied by caller "
                 "(species_id=%s, %d keys, no APIFarmer call needed)",
                 species_id,
                 len(species_data),
@@ -294,7 +294,7 @@ def _register_services(hass: HomeAssistant) -> None:
         if not species_data and cache and cache["species_cache"].get(sid_str):
             species_data = cache["species_cache"][sid_str]
             _LOGGER.info(
-                "Agribud: add_plant reusing in-memory cached species data for id=%s",
+                "Agribuddy: add_plant reusing in-memory cached species data for id=%s",
                 species_id,
             )
         # 2. Already-added plants of the same species
@@ -307,7 +307,7 @@ def _register_services(hass: HomeAssistant) -> None:
                     if cache:
                         cache["species_cache"][sid_str] = species_data
                     _LOGGER.info(
-                        "Agribud: add_plant reusing species data for id=%s from existing plant",
+                        "Agribuddy: add_plant reusing species data for id=%s from existing plant",
                         species_id,
                     )
                     break
@@ -320,14 +320,14 @@ def _register_services(hass: HomeAssistant) -> None:
                 if species_data and cache:
                     cache["species_cache"][sid_str] = species_data
                 _LOGGER.info(
-                    "Agribud: add_plant fetched species id=%s via api fallback "
+                    "Agribuddy: add_plant fetched species id=%s via api fallback "
                     "(%d keys)",
                     species_id,
                     len(species_data or {}),
                 )
             except VerdantlyRateLimitError as err:
                 _LOGGER.warning(
-                    "Agribud: rate limit hit when fetching species id=%s — plant "
+                    "Agribuddy: rate limit hit when fetching species id=%s — plant "
                     "added with empty species cache. User will need to re-search. (%s)",
                     species_id,
                     err,
@@ -338,7 +338,7 @@ def _register_services(hass: HomeAssistant) -> None:
                 VerdantlyConnectionError,
             ) as err:
                 _LOGGER.warning(
-                    "Agribud: could not fetch species id=%s during add_plant: %s. "
+                    "Agribuddy: could not fetch species id=%s during add_plant: %s. "
                     "Plant added without cached data — search for it again to repopulate.",
                     species_id,
                     err,
@@ -369,7 +369,7 @@ def _register_services(hass: HomeAssistant) -> None:
             )
         except Exception as err:
             _LOGGER.warning(
-                "Agribud: could not log planted event for %s — %s",
+                "Agribuddy: could not log planted event for %s — %s",
                 plant["id"],
                 err,
             )
@@ -384,7 +384,7 @@ def _register_services(hass: HomeAssistant) -> None:
         pid = call.data[ATTR_PLANT_ID]
         ok = await store.async_remove_plant(pid)
         if not ok:
-            _LOGGER.warning("Agribud: remove_plant — plant id=%s not found", pid)
+            _LOGGER.warning("Agribuddy: remove_plant — plant id=%s not found", pid)
             return
         await _refresh_all(hass)
         _fire_data_changed(hass, kind="plant_removed", plant_id=pid)
@@ -403,7 +403,7 @@ def _register_services(hass: HomeAssistant) -> None:
         )
         if event is None:
             _LOGGER.warning(
-                "Agribud: log_event for plant %s failed (plant not found?)",
+                "Agribuddy: log_event for plant %s failed (plant not found?)",
                 call.data[ATTR_PLANT_ID],
             )
             return
@@ -426,7 +426,7 @@ def _register_services(hass: HomeAssistant) -> None:
         ok = await store.async_remove_event(pid, eid)
         if not ok:
             _LOGGER.warning(
-                "Agribud: remove_event — could not remove event id=%s on plant %s",
+                "Agribuddy: remove_event — could not remove event id=%s on plant %s",
                 eid,
                 pid,
             )
@@ -450,7 +450,7 @@ def _register_services(hass: HomeAssistant) -> None:
         result = await store.async_update_overrides(pid, overrides)
         if result is None:
             _LOGGER.warning(
-                "Agribud: update_plant_overrides — no plant with id=%s",
+                "Agribuddy: update_plant_overrides — no plant with id=%s",
                 pid,
             )
             return
@@ -487,11 +487,11 @@ def _register_services(hass: HomeAssistant) -> None:
         if "plot_id" in call.data:
             kw["plot_id"] = call.data["plot_id"]
         if not kw:
-            _LOGGER.debug("Agribud: update_plant for %s — no fields supplied", pid)
+            _LOGGER.debug("Agribuddy: update_plant for %s — no fields supplied", pid)
             return
         result = await store.async_update_plant(pid, **kw)
         if result is None:
-            _LOGGER.warning("Agribud: update_plant — no plant with id=%s", pid)
+            _LOGGER.warning("Agribuddy: update_plant — no plant with id=%s", pid)
             return
         # If start_date changed, the synthetic "planted" event we created at
         # add-time is now stale (still on the old date). Re-anchor it.
@@ -499,7 +499,7 @@ def _register_services(hass: HomeAssistant) -> None:
             try:
                 await store.async_reanchor_planted_event(pid, kw["start_date"])
             except Exception as err:
-                _LOGGER.debug("Agribud: could not re-anchor planted event: %s", err)
+                _LOGGER.debug("Agribuddy: could not re-anchor planted event: %s", err)
         await _refresh_all(hass)
         _fire_data_changed(hass, kind="plant_updated", plant_id=pid)
 

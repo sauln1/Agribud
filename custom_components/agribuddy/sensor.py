@@ -1,6 +1,6 @@
-"""Sensor entities for Agribud.
+"""Sensor entities for Agribuddy.
 
-Weather mirror sensors (one per Agribud config entry) — read native units
+Weather mirror sensors (one per Agribuddy config entry) — read native units
 directly from the configured HA weather entity, no conversion.
 
 Per-plant sensors (created dynamically) — one per plant, with all
@@ -27,7 +27,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.helpers import entity_registry as er
 
 from .const import DOMAIN, EVENT_HARVESTED, EVENT_DEAD
-from .coordinator import AgribudCoordinator
+from .coordinator import AgribuddyCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,8 +35,8 @@ _LOGGER = logging.getLogger(__name__)
 def _device(entry: ConfigEntry) -> DeviceInfo:
     return DeviceInfo(
         identifiers={(DOMAIN, entry.entry_id)},
-        name="Agribud",
-        manufacturer="Agribud",
+        name="Agribuddy",
+        manufacturer="Agribuddy",
         model="Verdantly plant database",
         sw_version="0.1.0",
     )
@@ -47,7 +47,7 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    coord: AgribudCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
+    coord: AgribuddyCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
     async_add_entities(
         [
             WeatherMirror(
@@ -76,7 +76,7 @@ async def async_setup_entry(
     coord.async_add_listener(mgr.refresh)
 
 
-class WeatherMirror(CoordinatorEntity[AgribudCoordinator], SensorEntity):
+class WeatherMirror(CoordinatorEntity[AgribuddyCoordinator], SensorEntity):
     """Mirrors a field from the configured HA weather entity, preserving the
     native unit so HA does no automatic conversion."""
 
@@ -115,7 +115,7 @@ class WeatherMirror(CoordinatorEntity[AgribudCoordinator], SensorEntity):
         }
 
 
-class PlantSensor(CoordinatorEntity[AgribudCoordinator], SensorEntity):
+class PlantSensor(CoordinatorEntity[AgribuddyCoordinator], SensorEntity):
     """One sensor per plant.
 
     Status values (the sensor state):
@@ -333,7 +333,7 @@ class PlantSensorManager:
             ]
             self._add(entities)
             self._known.update(new_ids)
-            _LOGGER.info("Agribud: created %d new plant sensor(s)", len(entities))
+            _LOGGER.info("Agribuddy: created %d new plant sensor(s)", len(entities))
         # Remove sensors for plants no longer visible (soft-deleted or
         # hard-deleted by 6-month prune). Pulls from HA's entity registry
         # using the deterministic unique_id pattern set in PlantSensor.
@@ -346,7 +346,7 @@ class PlantSensorManager:
                 if ent_id:
                     registry.async_remove(ent_id)
                     _LOGGER.info(
-                        "Agribud: removed sensor for deleted plant id=%s (entity %s)",
+                        "Agribuddy: removed sensor for deleted plant id=%s (entity %s)",
                         pid,
                         ent_id,
                     )

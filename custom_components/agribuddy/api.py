@@ -108,7 +108,7 @@ class VerdantlyApiClient:
             try:
                 self._on_request(endpoint)
             except Exception as err:
-                _LOGGER.debug("Agribud: api-usage callback raised: %s", err)
+                _LOGGER.debug("Agribuddy: api-usage callback raised: %s", err)
         try:
             async with asyncio.timeout(TIMEOUT):
                 async with self._session.get(

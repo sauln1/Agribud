@@ -9,4 +9,4 @@ homeassistant:
 logger:
   default: info
   logs:
-    custom_components.agribud: debug
+    custom_components.agribuddydy: debug
