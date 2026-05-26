@@ -37,7 +37,17 @@ ignore = [
 	"D102", # missing docstring
 	"D101", # missing docstring
 	"ANN003", # missing annotation
-
+	"ANN001", # missing annotation
+	"D401", # annotations should be in imperative mood
+	"ANN201", # missing return type
+	"RUF012", # multiple values for default
+	"PLR0911", # too amny return statements
+	"DTZ003", # utcnow used
+	"ARG001", # unused
+	"PLR0913", # too many arguments in function
+	"C901", # too complicated
+	"PLR0912", # too maany branches
+	"PLR0915", # too many statements
 ]
 
 [lint.flake8-pytest-style]
