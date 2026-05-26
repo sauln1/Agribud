@@ -277,7 +277,7 @@ class AgribudCoordinator(DataUpdateCoordinator):
 
     # ── Auto-events ───────────────────────────────────────────────────────────
 
-    async def _maybe_rain(self, rain: bool, today: str, weather: dict) -> None:  # noqa: FBT001
+    async def _maybe_rain(self, rain: bool, today: str, weather: dict) -> None:
         """Called from the periodic refresh path. Auto-logs rain at most once
         per day. Realtime state changes go through _process_weather_change."""
         if not rain or self._rain_logged_date == today:

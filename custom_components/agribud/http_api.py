@@ -253,7 +253,7 @@ class AgribudTestConnectionView(HomeAssistantView):
         except VerdantlyAuthError as err:
             _LOGGER.exception(
                 "Agribud: connection test — Verdantly rejected key: %s", err
-            )  # noqa: TRY401
+            )
             return _json(
                 {
                     "ok": False,
@@ -383,7 +383,7 @@ class AgribudSearchView(HomeAssistantView):
                 }
             )
         except VerdantlyAuthError as err:
-            _LOGGER.exception("Agribud: search auth error: %s", err)  # noqa: TRY401
+            _LOGGER.exception("Agribud: search auth error: %s", err)
             return _json({"error": "invalid_auth", "message": str(err)}, 401)
         except VerdantlyRateLimitError as err:
             return _json({"error": "rate_limited", "message": str(err)}, 429)
