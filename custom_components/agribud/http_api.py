@@ -78,7 +78,7 @@ def async_register_views(hass: HomeAssistant) -> None:
                 name,
                 cls.url,
                 type(err).__name__,
-                err,  # noqa: TRY401
+                err,
             )
     _LOGGER.warning(
         "Agribud: HTTP view registration done — %d succeeded, %d failed.\n"
@@ -275,7 +275,7 @@ class AgribudTestConnectionView(HomeAssistantView):
         except VerdantlyConnectionError as err:
             _LOGGER.exception(
                 "Agribud: connection test — cannot reach Verdantly: %s", err
-            )  # noqa: TRY401
+            )
             return _json(
                 {
                     "ok": False,
@@ -285,7 +285,7 @@ class AgribudTestConnectionView(HomeAssistantView):
                 502,
             )
         except VerdantlyApiError as err:
-            _LOGGER.exception("Agribud: connection test — Verdantly API error: %s", err)  # noqa: TRY401
+            _LOGGER.exception("Agribud: connection test — Verdantly API error: %s", err)
             return _json({"ok": False, "error": "api_error", "message": str(err)}, 502)
         except Exception as err:
             _LOGGER.exception("Agribud: connection test — unexpected error")

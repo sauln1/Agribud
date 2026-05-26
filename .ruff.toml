@@ -51,6 +51,11 @@ ignore = [
 	"ARG005", # unused
 	"ARG002", # unused
 	"ANN204", # missing annotation
+	"TRY401", # redundant exception object
+	"FBT001", # Boolean-typed positional argument in function definition
+	"FBT002", # Boolean-typed positional argument in function definition
+	"ANN002", # missing type annotation
+	"RUF001", # ambiguous character
 ]
 
 [lint.flake8-pytest-style]
