@@ -25,7 +25,6 @@ from homeassistant.core import HomeAssistant, Event, callback
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .api import VerdantlyApiClient
 from .const import (
     DOMAIN,
     DEFAULT_UPDATE_INTERVAL,
@@ -34,6 +33,7 @@ from .const import (
 )
 
 if TYPE_CHECKING:
+    from .api import VerdantlyApiClient
     from .store import PlantStore
 
 _LOGGER = logging.getLogger(__name__)
@@ -277,7 +277,7 @@ class AgribudCoordinator(DataUpdateCoordinator):
 
     # ── Auto-events ───────────────────────────────────────────────────────────
 
-    async def _maybe_rain(self, rain: bool, today: str, weather: dict) -> None:
+    async def _maybe_rain(self, rain: bool, today: str, weather: dict) -> None:  # noqa: FBT001
         """Called from the periodic refresh path. Auto-logs rain at most once
         per day. Realtime state changes go through _process_weather_change."""
         if not rain or self._rain_logged_date == today:

@@ -115,7 +115,7 @@ class VerdantlyApiClient:
                     url, params=all_params, headers=headers
                 ) as r:
                     return await self._handle(r, safe_url), safe_url
-        except asyncio.TimeoutError as e:
+        except TimeoutError as e:
             msg = f"Timeout reaching Verdantly API ({safe_url})"
             raise VerdantlyConnectionError(msg) from e
         except aiohttp.ClientConnectionError as e:

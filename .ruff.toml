@@ -48,6 +48,9 @@ ignore = [
 	"C901", # too complicated
 	"PLR0912", # too maany branches
 	"PLR0915", # too many statements
+	"ARG005", # unused
+	"ARG002", # unused
+	"AN204", # missing annotation
 ]
 
 [lint.flake8-pytest-style]

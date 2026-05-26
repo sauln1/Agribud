@@ -14,6 +14,7 @@ State shape:
 When a new month rolls over (detected on next call or read), the count
 resets to zero automatically.
 """
+
 from __future__ import annotations
 
 import datetime as _dt
@@ -24,7 +25,7 @@ from homeassistant.helpers.storage import Store
 
 _LOGGER = logging.getLogger(__name__)
 
-_STORE_KEY     = "agribud.api_usage"
+_STORE_KEY = "agribud.api_usage"
 _STORE_VERSION = 1
 
 # Verdantly free-tier quota (calls per calendar month). Surfaced in the
@@ -54,12 +55,13 @@ class ApiUsageTracker:
         if isinstance(data, dict) and "month_key" in data:
             self._state = {
                 "month_key": str(data.get("month_key") or _current_month_key()),
-                "count":     int(data.get("count") or 0),
+                "count": int(data.get("count") or 0),
             }
         self._maybe_reset_month()
         _LOGGER.debug(
             "Agribud usage tracker loaded: month=%s, count=%d/%d",
-            self._state["month_key"], self._state["count"],
+            self._state["month_key"],
+            self._state["count"],
             VERDANTLY_FREE_MONTHLY_QUOTA,
         )
 
@@ -68,7 +70,8 @@ class ApiUsageTracker:
         if self._state.get("month_key") != cur:
             _LOGGER.info(
                 "Agribud usage tracker: new month %s (was %s) — resetting count.",
-                cur, self._state.get("month_key"),
+                cur,
+                self._state.get("month_key"),
             )
             self._state = {"month_key": cur, "count": 0}
             self._dirty = True
@@ -112,8 +115,8 @@ class ApiUsageTracker:
 
     def as_dict(self) -> dict:
         return {
-            "month":     self.month_key(),
-            "count":     self.current_count(),
+            "month": self.month_key(),
+            "count": self.current_count(),
             "remaining": self.remaining(),
-            "quota":     VERDANTLY_FREE_MONTHLY_QUOTA,
+            "quota": VERDANTLY_FREE_MONTHLY_QUOTA,
         }

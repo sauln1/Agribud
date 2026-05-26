@@ -9,7 +9,7 @@ import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.exceptions import ConfigEntryNotReady  # noqa: F401
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
@@ -234,7 +234,7 @@ async def _refresh_all(hass: HomeAssistant) -> None:
             await v["coordinator"].async_refresh()
 
 
-def _fire_data_changed(hass: HomeAssistant, kind: str, **extra) -> None:  # noqa: ANN003
+def _fire_data_changed(hass: HomeAssistant, kind: str, **extra) -> None:
     """Fire a bus event so the Lovelace card can react immediately."""
     payload = {"kind": kind, **extra}
     hass.bus.async_fire(f"{DOMAIN}_data_changed", payload)
