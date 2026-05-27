@@ -27,7 +27,7 @@ A Home Assistant integration + Lovelace card for tracking your garden. Plan grow
 
 ## Requirements
 
-- Home Assistant 2025.1 or later
+- Home Assistant 2025.12 or later
 - A weather entity (HA's built-in weather integration, MQTT weather sensor, template, or any entity exposing the standard weather attributes)
 - A free RapidAPI account + Verdantly Gardening API subscription. See setup below.
 
@@ -166,6 +166,8 @@ API usage tracking lives in `.storage/agribuddy.api_usage` keyed by `YYYY-MM`. R
 ---
 
 ## Troubleshooting
+
+**"404 Error" code** - if you are getting a 404 error code when adding a new plant, thisnis usually due to not having the integration set up completely, make sure you complete Step 2 under Setup.
 
 **"Verdantly rejected this key"** — the key is wrong or you haven't subscribed to the Verdantly Gardening API on RapidAPI. Double-check by visiting the API page on RapidAPI and confirming the **Subscribe** button is grey ("Subscribed").
 
